@@ -10,34 +10,30 @@ from json import JSONEncoder
 import pafy
 
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy   dog'
 app.config['CORS_HEADERS'] = 'Content-Type'
-
 cors = CORS(app, resources={r"/api3": {"origins": "*"}})
-
 api = Api(app)
 
 class Three(Resource):
     @cross_origin(origin='*')
-    def get(self):
+    def get(self,name):
         try:
             scraper = cfscrape.create_scraper()
-            curl="https://4anime.to/one-piece-episode-1?id=1051"
+            curl="https://4anime.to/" + name
             data=(scraper.get(curl).content)
             soup = BeautifulSoup(data,'html.parser')
-            st=soup.findAll('script' )#.getText()
-            #print(soup)
+            st=soup.findAll('video' )#.getText()
             for gt in st:
-                if "href" in str(gt):
-                    vt=gt
-                    break
-            print(vt)
-            return {'id': str(vt)}
-
+                yu=gt.find('source')
+                #print(yu['src'])
+            print(yu['src'])
+            return {'link': str(yu['src'])}
         except:
-            return "Fail"
+            return 'fail'
 
-api.add_resource(Three, "/test/360/")
+
+
+api.add_resource(Three, "/4Anime/<string:name>")
 if __name__ == "__main__":
     app.run(debug=True)
