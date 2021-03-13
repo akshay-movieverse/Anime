@@ -49,11 +49,11 @@ class One(Resource):
 class Two(Resource):
     @cross_origin(origin='*')
     
-    def get(self,name):
+    def get(self,ver,name):
         try:
             browser = load_chrome_driver()
             wait = ui.WebDriverWait(browser, 5)
-            url="https://animixplay.to/v1/"+name
+            url="https://animixplay.to/"+ver+"/"+name
             browser.get(url)
             iframe = wait.until(lambda browser: browser.find_element_by_id("iframeplayer"))
             tv=browser.switch_to.frame(iframe)
@@ -79,7 +79,7 @@ class Two(Resource):
 
 
 api.add_resource(One, "/4Anime/<string:name>")
-api.add_resource(Two, "/Animix/<string:name>")
+api.add_resource(Two, "/Animix/<string:ver>/<string:name>")
 if __name__ == "__main__":
     app.run(debug=True)
 
