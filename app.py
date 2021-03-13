@@ -13,6 +13,20 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 cors = CORS(app, resources={r"/api3": {"origins": "*"}})
 api = Api(app)
 
+def load_chrome_driver():
+
+      options = Options()
+
+      options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+
+      options.add_argument('--headless')
+      options.add_argument('--disable-gpu')
+      options.add_argument('--no-sandbox')
+      options.add_argument('--remote-debugging-port=9222')
+      #options.add_argument('--proxy-server='+proxy)
+
+      return webdriver.Chrome(executable_path=str(os.environ.get('CHROMEDRIVER_PATH')), chrome_options=options)
+
 class One(Resource):
     @cross_origin(origin='*')
     def get(self,name):
@@ -33,9 +47,10 @@ class One(Resource):
 
 class Two(Resource):
     @cross_origin(origin='*')
+    
     def get(self,name):
         try:
-            browser = webdriver.Chrome(options=options)
+            browser = load_chrome_driver()
             wait = ui.WebDriverWait(browser, 5)
             url="https://animixplay.to/v1/"+name
             browser.get(url)
