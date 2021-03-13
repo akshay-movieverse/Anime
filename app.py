@@ -23,7 +23,7 @@ def load_chrome_driver():
       options.add_argument('--headless')
       options.add_argument('--disable-gpu')
       options.add_argument('--no-sandbox')
-      options.add_argument('--remote-debugging-port=9222')
+      #options.add_argument('--remote-debugging-port=9222')
       #options.add_argument('--proxy-server='+proxy)
 
       return webdriver.Chrome(executable_path=str(os.environ.get('CHROMEDRIVER_PATH')), chrome_options=options)
@@ -50,23 +50,32 @@ class Two(Resource):
     @cross_origin(origin='*')
     
     def get(self,name):
-        
-        browser = load_chrome_driver()
-        wait = ui.WebDriverWait(browser, 5)
-        url="https://animixplay.to/v1/"+name
-        browser.get(url)
-        iframe = wait.until(lambda browser: browser.find_element_by_id("iframeplayer"))
-        tv=browser.switch_to.frame(iframe)
+        try:
+            browser = load_chrome_driver()
+            wait = ui.WebDriverWait(browser, 5)
+            url="https://animixplay.to/v1/"+name
+            browser.get(url)
+            iframe = wait.until(lambda browser: browser.find_element_by_id("iframeplayer"))
+            tv=browser.switch_to.frame(iframe)
+            try:
+                wait.until(lambda browser: browser.find_element_by_css_selector("#videocontainer > div > div.plyr__video-wrapper > video > source"))
+                html = browser.page_source
+                soup = BeautifulSoup(html,'html.parser')
+                st=soup.findAll('video' )#.getText()
+                yu=st[0].find("source")['src']
+                browser.close()
 
-        wait.until(lambda browser: browser.find_element_by_css_selector("#videocontainer > div > div.plyr__video-wrapper > video > source"))
-        html = browser.page_source
-        soup = BeautifulSoup(html,'html.parser')
-        st=soup.findAll('video' )#.getText()
-        yu=st[0].find("source")['src']
+            except:
+                wait.until(lambda browser: browser.find_element_by_id("player_html5_api"))
+                html = browser.page_source
+                soup = BeautifulSoup(html,'html.parser')
+                st=soup.findAll('video' )#.getText()
+                yu=st[0]['src']
+                browser.close()
 
-
-        return {'link': str(yu)}
-
+            return {'link': str(yu)}
+        except:
+            return 'fail'
 
 
 api.add_resource(One, "/4Anime/<string:name>")
