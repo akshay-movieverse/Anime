@@ -1,10 +1,13 @@
 from flask import Flask,jsonify, request 
 from flask_restful import Api, Resource
-from selenium import webdriver
+
 import cloudscraper as cfscrape
 from bs4 import BeautifulSoup
 
 from flask_cors import CORS, cross_origin
+import json
+from json import JSONEncoder
+import pafy
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy   dog'
@@ -16,11 +19,10 @@ class Three(Resource):
     @cross_origin(origin='*')
     def get(self,name):
         try:
-            browser = webdriver.PhantomJS()
-            url="https://4anime.to/"+name
-            browser.get(url)
-            html = browser.page_source
-            soup = BeautifulSoup(html,'html.parser')
+            scraper = cfscrape.create_scraper()
+            curl="https://4anime.to/" + name
+            data=(scraper.get(curl).content)
+            soup = BeautifulSoup(data,'html.parser')
             st=soup.findAll('video' )#.getText()
             for gt in st:
                 yu=gt.find('source')
@@ -35,6 +37,3 @@ class Three(Resource):
 api.add_resource(Three, "/4Anime/<string:name>")
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
