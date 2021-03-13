@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import ui
 from flask_cors import CORS, cross_origin
+import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy   dog'
