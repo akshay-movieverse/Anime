@@ -33,7 +33,7 @@ class One(Resource):
     def get(self,name):
         try:
             browser = webdriver.PhantomJS()
-            url="https://4anime.to/"+name
+            url="https://4anime.gg/"+name
             browser.get(url)
             html = browser.page_source
             soup = BeautifulSoup(html,'html.parser')
